@@ -22,93 +22,66 @@ Frequency Modulation (FM) is a method of transmitting information over a carrier
 
 ### PROGRAM
 import numpy as np
+    import matplotlib.pyplot as plt
+    from scipy.signal import hilbert
+    
+    Am = 8.5
+    fm = 218.9
+    fs = 21300
+    Ac = 17
+    fc = 2189
+    b = 6
+    
+    t = np.arange(0, 2/fm, 1/fs)
+    
+    m = Am * np.cos(2 * np.pi * fm * t)
+    c = Ac * np.cos(2 * np.pi * fc * t)
+    s = Ac * np.cos(2 * np.pi * fc * t + b * np.sin(2 * np.pi * fm * t))
+    
+    
+    ds = np.diff(s)
+    analytic_signal = hilbert(ds) 
+    envelope = np.abs(analytic_signal) 
+    demod = envelope - np.mean(envelope)  
+    demod = demod / np.max(np.abs(demod)) * Am 
+    
+    plt.figure(figsize=(10,8))
+    
+    plt.subplot(4,1,1)
+    plt.plot(t, m)
+    plt.title("Message Signal")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Amplitude")
+    
+    plt.subplot(4,1,2)
+    plt.plot(t, c)
+    plt.title("Carrier Signal")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Amplitude")
+    
+    plt.subplot(4,1,3)
+    plt.plot(t, s)
+    plt.title("Frequency Modulated Signal (FM)")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Amplitude")
+    
+    plt.subplot(4,1,4)
+    plt.plot(t[:-1], demod)  # ds shortens length by 1
+    plt.title("Demodulated Signal (Recovered Message)")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Amplitude")
+    plt.tight_layout()
+    plt.show()
+    
+    ###TABULATION:
+      ![WhatsApp Image 2025-11-20 at 07 19 37_d1f45844](https://github.com/user-attachments/assets/c61039ce-e2f6-4979-ac3f-0b9fc309ba9f)
 
-import matplotlib.pyplot as plt
-
-from scipy.signal import hilbert
-
-Ac = 17 
-
-Am = 8.5   
-
-fc = 2189  
-
-fm = 218.9 
-
-fs = 21300  
-
-kp = np.pi / 4 
-
-
-t = np.arange(0, 2/fm, 1/fs)
-
-m = Am * np.cos(2 * np.pi * fm * t)
-
-c = Ac * np.cos(2 * np.pi * fc * t)
-
-s = Ac * np.cos(2 * np.pi * fc * t + kp * m)
-
-analytic_signal = hilbert(s)
-
-inst_phase = np.unwrap(np.angle(analytic_signal))
-
-m_demod = (inst_phase - 2 * np.pi * fc * t) / kp
-
-m_demod = m_demod - np.mean(m_demod)  
-
-plt.figure(figsize=(10, 8))
-
-plt.subplot(4, 1, 1)
-
-plt.plot(t, m, color='blue')
-
-plt.title('Message Signal
-
-plt.xlabel('Time (s)')
-
-plt.ylabel('Amplitude (V)')
-
-plt.subplot(4, 1, 2)
-
-plt.plot(t, c, color='orange')
-
-plt.title('Carrier Signal')
-
-plt.xlabel('Time (s)')
-
-plt.ylabel('Amplitude (V)')
-
-plt.subplot(4, 1, 3)
-
-plt.plot(t, s, color='green')
-
-plt.title('Phase Modulated (PM) Signal')
-
-plt.xlabel('Time (s)')
-
-plt.ylabel('Amplitude (V)')
-
-plt.subplot(4, 1, 4)
-
-plt.plot(t, m_demod, color='red')
-
-plt.title('Demodulated (Recovered) Signal')
-
-plt.xlabel('Time (s)')
-
-plt.ylabel('Amplitude (V)')
-
-plt.tight_layout()
-
-plt.show()
-
-### TABULATION
-![WhatsApp Image 2025-11-20 at 07 21 27_65eae0be](https://github.com/user-attachments/assets/462ea725-79d9-4567-9dd1-abb2fcf9912f)
+    ###OUTPUT
 
 
-### OUTPUT
-![WhatsApp Image 2025-11-20 at 07 21 54_d1fd5bf2](https://github.com/user-attachments/assets/b07cf4c8-f0fe-4267-b087-1849b1d29f76)
+    ![WhatsApp Image 2025-11-20 at 07 19 53_8872dd05](https://github.com/user-attachments/assets/8687152c-c88e-447a-886b-9630437cbcc1)
 
-   
-### RESULT
-The message signal, carrier signal, and phase-modulated (PM) signal will be displayed in separate plots. The modulated signal will show phase variations corresponding to the amplitude of the message signal.
+    ###RESULT
+
+    The message signal, carrier signal, and frequency modulated (FM) signal will be displayed in separate plots. The modulated signal will show frequency variations corresponding to the amplitude of the message       signal.
+
